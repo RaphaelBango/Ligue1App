@@ -1,0 +1,88 @@
+import reflex as rx
+from docutils.parsers.rst.directives.tables import align
+
+
+class DataTable(rx.State):
+    data: list[dict[str, str]] = [
+        {
+            "profile": "https://cdn.githubraw.com/jbcodefr/Files-For-Tuto/main/PythonReflex/3d-bunny-digital-avatar-midjourney-prompt.jpg",
+            "joueurs":"Kylian Mbappé",
+            "equipes": "Paris Saint-Germain",
+            "buts": "18",
+            "matchs": "20"
+        },
+        {
+            "profile": "https://cdn.githubraw.com/jbcodefr/Files-For-Tuto/main/PythonReflex/caribbean-man-summer-avatar-midjourney.jpg",
+            "joueurs": "Wissam Ben Yedder",
+            "equipes": "AS Monaco",
+            "buts": "18",
+            "matchs": "26"
+        },
+        {
+            "profile": "https://cdn.githubraw.com/jbcodefr/Files-For-Tuto/main/PythonReflex/cute-penguin-midjourney-prompt.jpg",
+            "joueurs": "Moussa Dembelé",
+            "equipes": "Olympique Lyonnais",
+            "buts": "16",
+            "matchs": "27"
+        },
+        {
+            "profile": "https://cdn.githubraw.com/jbcodefr/Files-For-Tuto/main/PythonReflex/futuristic-digital-avatar-midjourney-prompt.jpg",
+            "joueurs": "Victor Osimhen",
+            "equipes": "Lille",
+            "buts": "13",
+            "matchs": "27"
+        }
+    ]
+    color_map: dict[str, str] = {
+        "Lille": "red",
+        "Olympique Lyonnais": "cyan",
+        "As Monaco": "pink",
+        "Paris Saint-germain": "blue"
+    }
+
+def create_data_row(data: dict[str, str]) :
+    return rx.table.row(
+        rx.table.cell(
+            rx.hstack(
+                rx.avatar(src=data["profile"], size="1"),
+                rx.text(data["joueurs"], color_scheme="gray", weight="medium"),
+            )
+        ),
+        rx.table.cell(
+            rx.badge(data["equipes"],color_scheme=DataTable.color_map[data["equipes"]],weight="medium"),
+        ),
+        rx.table.cell(
+            rx.text(data["buts"],color_scheme="gray",weight="medium",text_decoration="underline"),
+        ),
+        rx.table.cell(
+            rx.text(data["matchs"], color_scheme="sky", weight="medium", text_decoration="underline"),
+        ),
+        align="center",
+        whitespace="nowrap"
+    )
+
+@rx.page("/","DATA TABLE")
+def index():
+    return rx.box(rx.table.root(
+        rx.table.header(
+            rx.table.row(
+                rx.foreach(
+                    ["Joueurs","Equipes","Buts","Matchs"],
+                    lambda title:
+                    rx.table.column_header_cell(
+                        rx.text(title,font_size="12px",weight="bold"),
+                    )
+                )
+            )
+        ),
+        rx.table.body(
+            rx.foreach(DataTable.data,create_data_row)
+        ),
+        width="100%",
+        max_width="900px",
+    ),
+        rx.color_mode.button(position="top-right")
+        ,width="100%",height="100vh",align="center",padding="2em")
+
+app = rx.App()
+
